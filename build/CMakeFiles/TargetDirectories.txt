@@ -1,0 +1,2 @@
+/home/lhz/thread_pool/build/CMakeFiles/edit_cache.dir
+/home/lhz/thread_pool/build/CMakeFiles/rebuild_cache.dir
