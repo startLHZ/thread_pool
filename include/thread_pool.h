@@ -41,7 +41,7 @@ private:
     std::condition_variable notEmpty;    //条件变量，队列不为空
     std::thread* threadIDs;              //工作的线程ID
     std::thread managerID;               //管理的线程ID
-    task_queue* taskQ;                 //任务队列
+    task_queue* taskQ;                   //任务队列
     int minNum;               //最小线程数量
     int maxNum;               //最大线程数量
     int busyNum;              //在忙线程数
