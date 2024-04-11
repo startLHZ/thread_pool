@@ -1,7 +1,17 @@
 [
 {
   "directory": "/home/lhz/thread_pool/build",
-  "command": "/usr/bin/g++  -I/home/lhz/thread_pool/include -g -o CMakeFiles/test.dir/src/main.cpp.o -c /home/lhz/thread_pool/src/main.cpp",
+  "command": "/usr/bin/g++  -I/home/lhz/thread_pool/include -g -o CMakeFiles/thread_pool.dir/src/main.cpp.o -c /home/lhz/thread_pool/src/main.cpp",
   "file": "/home/lhz/thread_pool/src/main.cpp"
+},
+{
+  "directory": "/home/lhz/thread_pool/build",
+  "command": "/usr/bin/g++  -I/home/lhz/thread_pool/include -g -o CMakeFiles/thread_pool.dir/src/task_queue.cpp.o -c /home/lhz/thread_pool/src/task_queue.cpp",
+  "file": "/home/lhz/thread_pool/src/task_queue.cpp"
+},
+{
+  "directory": "/home/lhz/thread_pool/build",
+  "command": "/usr/bin/g++  -I/home/lhz/thread_pool/include -g -o CMakeFiles/thread_pool.dir/src/thread_pool.cpp.o -c /home/lhz/thread_pool/src/thread_pool.cpp",
+  "file": "/home/lhz/thread_pool/src/thread_pool.cpp"
 }
 ]

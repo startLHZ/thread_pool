@@ -2,24 +2,14 @@
 #include <iostream>
 #include <queue>
 #include <mutex>
-
-
-// # include"../src/task_queue.cpp"
+#include <condition_variable>
 
 using callback = void (*)(void* arg);
 
 class Task{
 public:
-    // Task() {
-    //     this->function = nullptr;
-    //     this->arg = nullptr;
-    // }
-    // Task(callback func, void* arg) {
-    //     this->function = func;
-    //     this->arg = arg;
-    // } 
     Task(callback func = nullptr, void* arg = nullptr) : function(func), arg(arg){};
-private:
+
     callback function;
     void* arg;
 };
@@ -27,8 +17,9 @@ private:
 class task_queue
 {
 public:
-    task_queue(/* args */);
-    ~task_queue();
+    task_queue() {
+
+    };
     // 添加任务
     void add_task(Task task);
     void add_task(callback func, void* arg);
@@ -38,12 +29,12 @@ public:
 
     // 获取当前任务队列个数
     inline int get_task_number() {
-        return my_queue.size();
+        int n = my_queue.size();
+        return n;
     }
 private:
     /* data */
     std::mutex m_mtx;
     std::queue<Task> my_queue;
 };
-
 

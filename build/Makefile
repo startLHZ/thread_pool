@@ -117,24 +117,24 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named test
+# Target rules for targets named thread_pool
 
 # Build rule for target.
-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test
-.PHONY : test
+thread_pool: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 thread_pool
+.PHONY : thread_pool
 
 # fast build rule for target.
-test/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
-.PHONY : test/fast
+thread_pool/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/thread_pool.dir/build.make CMakeFiles/thread_pool.dir/build
+.PHONY : thread_pool/fast
 
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
 # target to build an object file
 src/main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/main.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/thread_pool.dir/build.make CMakeFiles/thread_pool.dir/src/main.cpp.o
 .PHONY : src/main.cpp.o
 
 src/main.i: src/main.cpp.i
@@ -142,7 +142,7 @@ src/main.i: src/main.cpp.i
 
 # target to preprocess a source file
 src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/thread_pool.dir/build.make CMakeFiles/thread_pool.dir/src/main.cpp.i
 .PHONY : src/main.cpp.i
 
 src/main.s: src/main.cpp.s
@@ -150,8 +150,56 @@ src/main.s: src/main.cpp.s
 
 # target to generate assembly for a file
 src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/thread_pool.dir/build.make CMakeFiles/thread_pool.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
+
+src/task_queue.o: src/task_queue.cpp.o
+.PHONY : src/task_queue.o
+
+# target to build an object file
+src/task_queue.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/thread_pool.dir/build.make CMakeFiles/thread_pool.dir/src/task_queue.cpp.o
+.PHONY : src/task_queue.cpp.o
+
+src/task_queue.i: src/task_queue.cpp.i
+.PHONY : src/task_queue.i
+
+# target to preprocess a source file
+src/task_queue.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/thread_pool.dir/build.make CMakeFiles/thread_pool.dir/src/task_queue.cpp.i
+.PHONY : src/task_queue.cpp.i
+
+src/task_queue.s: src/task_queue.cpp.s
+.PHONY : src/task_queue.s
+
+# target to generate assembly for a file
+src/task_queue.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/thread_pool.dir/build.make CMakeFiles/thread_pool.dir/src/task_queue.cpp.s
+.PHONY : src/task_queue.cpp.s
+
+src/thread_pool.o: src/thread_pool.cpp.o
+.PHONY : src/thread_pool.o
+
+# target to build an object file
+src/thread_pool.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/thread_pool.dir/build.make CMakeFiles/thread_pool.dir/src/thread_pool.cpp.o
+.PHONY : src/thread_pool.cpp.o
+
+src/thread_pool.i: src/thread_pool.cpp.i
+.PHONY : src/thread_pool.i
+
+# target to preprocess a source file
+src/thread_pool.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/thread_pool.dir/build.make CMakeFiles/thread_pool.dir/src/thread_pool.cpp.i
+.PHONY : src/thread_pool.cpp.i
+
+src/thread_pool.s: src/thread_pool.cpp.s
+.PHONY : src/thread_pool.s
+
+# target to generate assembly for a file
+src/thread_pool.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/thread_pool.dir/build.make CMakeFiles/thread_pool.dir/src/thread_pool.cpp.s
+.PHONY : src/thread_pool.cpp.s
 
 # Help Target
 help:
@@ -161,10 +209,16 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... test"
+	@echo "... thread_pool"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/task_queue.o"
+	@echo "... src/task_queue.i"
+	@echo "... src/task_queue.s"
+	@echo "... src/thread_pool.o"
+	@echo "... src/thread_pool.i"
+	@echo "... src/thread_pool.s"
 .PHONY : help
 
 

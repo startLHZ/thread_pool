@@ -1,88 +1,127 @@
-#include "thread_pool.h"
+#include "../include/thread_pool.h"
+#include <vector>
+#include <thread>
+#include <mutex>
+#include <unistd.h>
 
-thread_pool::thread_pool(int _max, int _min) {
+thread_pool::thread_pool(int _min) 
+        : shutdown(false), busyNum(0), aliveNum(_min), exitNum(0) 
+{
     taskQ = new task_queue;
     minNum = _min;
-    maxNum = _max;
-    busyNum = 0; 
-    aliveNum = _min;     
-    exitNum = 0;  
-
-    // 根据线程最大上限分配内存
-    vector<std::thread> threadIDs = new std::thread(maxNum);
-    if (threadIDs == nullptr) {
-        std::cout << "thread_pool(): new thread[maxNum] error" << std::endl;
-    }
-
-    // *******创建线程***************
-    // 根据最小线程数创建线程
-    for (int i = 0; i < minNum; i ++) {
-        threadIDs[i] = std::thread(worker, this);
-        std::cout << threadIDs[i] << std::endl;
-    }
-    managerID = std::thread(manager, this);
-    return ;
-}
-
-thread_pool::~thread_pool() {
-    std::unique_lock<std::mutex> locker(this->pool_mtx);
-    this->shutdown = true;
-    notEmpty.notify_all();
-    for (int i = 0; i <= this->aliveNum; i ++) {
-        if (threadIDs[i] == 0) continue;
-        threadIDs[i].join();
-    }
-}
-
-void* thread_pool::worker(void* arg) {
-    thread_pool pool = (thread_pool*) arg;
-
-    while (1) {
-        std::unique_lock(std::mutex) locker(this->pool_mtx);
-        while (pool->takeTask.get_task_number() == 0) {
-            pool->notEmpty.wait(locker);
-            // 是否销毁线程
-            if (pool->exitNum > 0) {
-                pool->exitNum --;
-                if (pool->aliveNum > pool->minNum) {
-                    pool->aliveNum--;
-                    locker.unlock();
-                    return;
-                }
-            }
-        }
-        // 线程池是否关闭   
-        if (pool->shutdown) {
-            locker.unlock();
-            return ;
-        }
-        pool->busyNum ++;
-        Task task = pool->taskQ->takeTask();
-        locker.unlock();
-        task.function(task.arg);
-
-        std::unique_lock(std::mutex) locker(this->pool_mtx);
-        pool->busyNum --;
-        locker.unlock();
-    }
-    return nullptr;
-}
-
-void* thread_pool::manager(void* arg) {
-
-}
-
-void thread_pool::add_task(Task task) {
-    std::unique_lock<std::mutex> locker(pool_mtx);
-    task_queue.push(task);
-    notEmpty.notify_one();
+    std::unique_lock<std::mutex> locker(pool_mtx, std::defer_lock);
+    locker.lock();
+    // auto t = std::thread(manager,this);
+    // auto id = t.get_id();
+    threadIDs.push_back(std::thread(manager,this));
+    aliveNum ++;
+    // managerID = std::thread(&manager, this);
+    make_thread(minNum);      
     locker.unlock();
 }
 
-void thread_pool::sigle_thread_exit() {
-    std::thread tid = this_thread();
-    for (int i = 0; i < this->maxNum; i ++) {
-        threadIDs[i] = 0;
-        break;
+thread_pool::~thread_pool() {
+    shutdown = true;
+    for (int i  = 0; i < threadIDs.size(); ++ i) {
+        // notEmpty.notify_all();
+        notEmpty.notify_one();
+        if(threadIDs[i].joinable()){
+            threadIDs[i].join(); // 等待任务结束， 前提：线程一定会执行完
+        }     
     }
+    // if (managerID.joinable()) {
+    //     managerID.join();
+    // }
+    return;
+}
+
+void* thread_pool::worker(void* arg) {
+    thread_pool* pool = static_cast<thread_pool*>(arg);
+    while (1)
+    {
+        std::unique_lock<std::mutex> locker(pool->pool_mtx);
+        pool->notEmpty.wait(locker, [&]()->bool{ return pool->get_taskQ_size() || pool->if_shutdown();});
+        if (pool->if_shutdown()) {
+            pool->aliveNum --;
+            locker.unlock();
+            pool->notEmpty.notify_one();
+            return nullptr;
+        }
+        if (pool->exitNum) {
+            auto t = std::this_thread::get_id();
+            for (auto i = pool->threadIDs.begin(); i != pool->threadIDs.end(); i ++) {
+                if (i->get_id() == t) {
+                    pool->threadIDs.erase(i, i + 1);
+                }
+            }
+            pool->exitNum --;
+            pool->aliveNum --;
+            return nullptr;
+        }
+        auto curTask = pool->taskQ->takeTask();
+        pool->busyNum ++;
+
+        locker.unlock();
+
+
+        curTask.function(curTask.arg);
+
+
+        locker.lock();
+        pool->busyNum --;
+        locker.unlock();
+    }
+}
+
+void thread_pool::add_task(Task task) {
+    if (shutdown) return ;
+    std::unique_lock<std::mutex> locker(pool_mtx, std::defer_lock);
+    locker.lock();
+    taskQ->add_task(task);
+    locker.unlock();
+    notEmpty.notify_one();
+}
+
+void* thread_pool::manager(void* arg) {
+    thread_pool* pool = static_cast<thread_pool*>(arg);
+    while (1) {
+        sleep(1);
+        std::unique_lock<std::mutex> locker(pool->pool_mtx, std::defer_lock);
+        locker.lock();
+        if (pool->if_shutdown()) {
+            pool->aliveNum --;
+            locker.unlock();
+            pool->notEmpty.notify_one();
+            return nullptr;
+        }
+        
+        int busy = pool->get_busyNum(), alive = pool->get_aliveNum(), taskNum = pool->get_taskQ_size();
+        if (taskNum > 100) pool->make_thread(taskNum / 3);
+        if (taskNum == 0) pool->kill_worker(10);
+
+        // -------------------
+        // 测试性能，max task queue size and max aliveNum
+        pool->max_alive_num = pool->max_alive_num > alive ? pool->max_alive_num : alive;
+        pool->max_task_queue_size = pool->max_task_queue_size > taskNum ? pool->max_task_queue_size : taskNum;
+        // -------------------
+
+        locker.unlock();
+    }
+}
+
+void thread_pool::make_thread(int n) {
+    // 不需要加锁
+    if (aliveNum + n > 8000) {
+        n = 8000 - aliveNum;
+    }
+    aliveNum += n;
+    for (int i = 0; i < n; ++ i) {
+        threadIDs.push_back(std::thread(&worker, this));
+        // threadIDs.back().detach();
+    }  
+}
+
+void thread_pool::kill_worker(int n) {
+    exitNum += n;
+    exitNum = exitNum > aliveNum - 1 ? aliveNum - 1 : exitNum;
 }

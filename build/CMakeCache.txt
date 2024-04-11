@@ -209,15 +209,6 @@ CMAKE_STRIP:FILEPATH=/usr/bin/strip
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
 //Value Computed by CMake
-TEST_BINARY_DIR:STATIC=/home/lhz/thread_pool/build
-
-//Value Computed by CMake
-TEST_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-TEST_SOURCE_DIR:STATIC=/home/lhz/thread_pool
-
-//Value Computed by CMake
 thread_pool_BINARY_DIR:STATIC=/home/lhz/thread_pool/build
 
 //Value Computed by CMake

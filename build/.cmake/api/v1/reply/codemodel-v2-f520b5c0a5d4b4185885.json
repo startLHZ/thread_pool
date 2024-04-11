@@ -38,9 +38,9 @@
 			[
 				{
 					"directoryIndex" : 0,
-					"id" : "test::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-test-Debug-0d78b33858a827d63c44.json",
-					"name" : "test",
+					"id" : "thread_pool::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-thread_pool-Debug-52042fb62f5309fb140b.json",
+					"name" : "thread_pool",
 					"projectIndex" : 0
 				}
 			]
